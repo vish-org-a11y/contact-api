@@ -1,1 +1,3 @@
 node_modules
+authVar.env
+clean-react-native.bat

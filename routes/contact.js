@@ -6,7 +6,7 @@ const checkAuth = require('../middleware/checkAuth')
 const jwt = require('jsonwebtoken')
 
 //add contact
-router.post('/',checkAuth,(req,res)=>{
+router.post('/signup',checkAuth,(req,res)=>{
     const token = req.headers.authorization.split(" ")[1]
     const verify = jwt.verify(token, 'sbs 147')
     newContact = new Contact({
