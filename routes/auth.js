@@ -4,7 +4,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-const User = require('../models/User'); // Adjust path as needed
+const User = require('../model/user'); // Adjust path as needed
 
 // In-memory OTP store
 const otpStore = {};
