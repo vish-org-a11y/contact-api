@@ -5,8 +5,6 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
-const nodemailer = require('nodemailer');
-
 //signup api
 router.post('/signup',(req,res)=>{
     console.log('signup post request')
