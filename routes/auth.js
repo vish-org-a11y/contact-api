@@ -25,6 +25,9 @@ router.post('/login', async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     otpStore[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 };
 
+    console.log("Email:", process.env.EMAIL_USER);
+console.log("Password:", process.env.EMAIL_PASS);
+
     // Send OTP via email
     const transporter = nodemailer.createTransport({
       service: 'gmail',
