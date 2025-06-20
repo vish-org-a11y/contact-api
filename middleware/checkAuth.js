@@ -4,8 +4,8 @@ module.exports = (req,res,next)=>{
     // console.log(req.headers.authorization)
     try{
         const token = req.headers.authorization.split(" ")[1]
-        const verify = jwt.verify(token,'sbs 147')
-        // console.log(verify)
+        const verify = jwt.verify(token,'sbs_147')
+         console.log('Token Verify'+verify);
         if(verify)
         {
             next();

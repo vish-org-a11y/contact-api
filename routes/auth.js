@@ -4,7 +4,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-const User = require('../model/user'); // Adjust path as needed
+const CollegeModel = require('../model/collegeModel'); // Adjust path as needed
 
 // In-memory OTP store
 const otpStore = {};
@@ -13,20 +13,23 @@ const otpStore = {};
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
-    // Check user exists
-    const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ msg: 'User not found' });
+    // Check College exists
+    const collegeModel = await CollegeModel.findOne({ email });
+    if (!collegeModel) return res.status(401).json({ msg: 'College not found' });
 
     // Validate password
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, collegeModel.password);
     if (!isMatch) return res.status(401).json({ msg: 'Invalid password' });
 
     // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log('Generated OTP:'+otp);
+
     otpStore[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 };
+    console.log('OTP Store in array after generated OTP: '+otpStore[email]);
 
     console.log("Email:", process.env.EMAIL_USER);
-console.log("Password:", process.env.EMAIL_PASS);
+    console.log("Password:", process.env.EMAIL_PASS);
 
     // Send OTP via email
     const transporter = nodemailer.createTransport({
@@ -51,7 +54,7 @@ console.log("Password:", process.env.EMAIL_PASS);
   }
 });
 
-// POST /api/auth/verify-otp — Step 2: Verify OTP & generate token
+//POST /api/auth/verify-otp — Step 2: Verify OTP & generate token
 router.post('/verify-otp', async (req, res) => {
   const { email, otp } = req.body;
 
@@ -65,29 +68,31 @@ router.post('/verify-otp', async (req, res) => {
     if (record.otp !== otp) return res.status(401).json({ msg: 'Invalid OTP' });
 
     delete otpStore[email];
-
-    const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ msg: 'User not found' });
+    const collegeModel = await CollegeModel.findOne({ email });
+    if (!collegeModel) return res.status(401).json({ msg: 'College not found' });
 
     const token = jwt.sign(
       {
-        userId: user._id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        collegeModelId: collegeModel._id,
+        email: collegeModel.email,
+        collegeName: collegeModel.collegeName,
+        collegeCode: collegeModel.collegeCode,
       },
+        
       process.env.JWT_SECRET,
-      { expiresIn: '365d' }
-    );
+      { 
+        expiresIn: '365d'
+      }
+    )
 
     res.status(200).json({
       msg: 'OTP verified',
       token,
-      user: {
-        userId: user._id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
+      collegeModel: {
+        collegeModelId: collegeModel._id,
+        email: collegeModel.email,
+        collegeName: collegeModel.collegeName,
+        collegeCode: collegeModel.collegeCode,
       },
     });
   } catch (err) {
@@ -95,5 +100,62 @@ router.post('/verify-otp', async (req, res) => {
     res.status(500).json({ msg: 'Server Error' });
   }
 });
+
+// router.post('/verify-otp', async (req, res) => {
+//   const { email, otp } = req.body;
+
+//   try {
+//     const record = otpStore[email];
+//     // if (!record) {
+//     //   return res.status(400).json({ msg: 'No OTP found for this email' });
+//     // }
+
+//     // if (Date.now() > record.expiresAt) {
+//     //   delete otpStore[email];
+//     //   return res.status(400).json({ msg: 'OTP expired' });
+//     // }
+
+//     // if (record.otp !== otp) {
+//     //   return res.status(401).json({ msg: 'Invalid OTP' });
+//     // }
+
+//     // OTP is valid, delete from store
+//     delete otpStore[email];
+
+//      const collegeModel = await CollegeModel.findOne({ email });
+//     // if (!collegeModel) {
+//     //   return res.status(404).json({ msg: 'College not found' });
+//     // }
+
+//     const token = jwt.sign(
+//       {
+//         collegeModelId: collegeModel._id,
+//         email: collegeModel.email,
+//         collegeName: collegeModel.collegeName,
+//         collegeCode: collegeModel.collegeCode,
+//       },
+//       process.env.JWT_SECRET,
+//       { 
+//         expiresIn: "365d" 
+//       },
+//     )
+
+//     return res.status(200).json({
+//       msg: 'OTP verified',
+//       token,
+//       collegeModel: {
+//         collegeModelId: collegeModel._id,
+//         email: collegeModel.email,
+//         collegeName: collegeModel.collegeName,
+//         collegeCode: collegeModel.collegeCode,
+//       },
+//     });
+
+//   } catch (err) {
+//     console.error('OTP verification error:', err);
+//     res.status(500).json({ msg: 'Server Error' });
+//   }
+// });
+
 
 module.exports = router;
