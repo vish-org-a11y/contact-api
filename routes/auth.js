@@ -60,6 +60,8 @@ router.post('/verify-otp', async (req, res) => {
 
   try {
     const record = otpStore[email];
+    console.log({ email, otp, record });
+
     if (!record) return res.status(400).json({ msg: 'No OTP found for this email' });
     if (Date.now() > record.expiresAt) {
       delete otpStore[email];
