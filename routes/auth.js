@@ -67,7 +67,11 @@ router.post('/verify-otp', async (req, res) => {
       delete otpStore[email];
       return res.status(400).json({ msg: 'OTP expired' });
     }
-    if (record.otp !== otp) return res.status(401).json({ msg: 'Invalid OTP' });
+   
+    if (record.otp.toString().trim() !== otp.toString().trim()) {
+      console.log('Mismatch:', { backendStoredOtp: record.otp, frontendOtp: otp });
+      return res.status(401).json({ msg: 'Invalid OTP' });
+    }
 
     delete otpStore[email];
     const collegeModel = await CollegeModel.findOne({ email });
