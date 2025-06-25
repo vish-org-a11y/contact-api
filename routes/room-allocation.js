@@ -14,7 +14,9 @@ router.post('/room-allocations', checkAuth, async (req, res) => {
       capacity: req.body.capacity,
       floorName: req.body.floorName,
       startRollNo: req.body.startRollNo,
-      endRollNo: req.body.endRollNo
+      endRollNo: req.body.endRollNo,
+      collegeName:req.body.collegeName,
+      collegeCode:req.body.collegeCode
     });
 
     const result = await room.save();

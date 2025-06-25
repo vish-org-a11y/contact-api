@@ -15,7 +15,7 @@ router.post('/login', async (req, res) => {
   try {
     // Check College exists
     const collegeModel = await CollegeModel.findOne({ email });
-    if (!collegeModel) return res.status(401).json({ msg: 'College not found' });
+    if (!collegeModel) return res.status(401).json({ msg: 'Invalid Username' });
 
     // Validate password
     const isMatch = await bcrypt.compare(password, collegeModel.password);
@@ -26,7 +26,6 @@ router.post('/login', async (req, res) => {
     console.log('Generated OTP:'+otp);
 
     otpStore[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 };
-    console.log('OTP Store in array after generated OTP: '+otpStore[email]);
 
     console.log("Email:", process.env.EMAIL_USER);
     console.log("Password:", process.env.EMAIL_PASS);
