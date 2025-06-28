@@ -28,6 +28,7 @@ router.post('/signup', async (req, res) => {
         await newCollege.save();
 
         const collegeMasterData = new collegeMaster({
+              _id: new mongoose.Types.ObjectId(), // ✅ required if defined in schema
             collegeName: req.body.collegeName,
             collegeCode: req.body.collegeCode
         });
