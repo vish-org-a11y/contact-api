@@ -60,6 +60,9 @@ router.get('/room-allocations-all', async (req, res) => {
   try {
     const { collegeCode, collegeName } = req.query;
 
+    console.log(collegeName);
+    console.log(collegeCode);
+
     if (!collegeCode || !collegeName) {
       return res.status(400).json({ error: 'collegeCode and collegeName are required' });
     }
@@ -69,6 +72,8 @@ router.get('/room-allocations-all', async (req, res) => {
       collegeName: collegeName,
     });
 
+    console.log(rooms);
+    
     res.json(rooms);
   } catch (error) {
     res.status(500).json({ error: error.message });
