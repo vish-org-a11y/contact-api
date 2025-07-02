@@ -10,13 +10,13 @@ router.post('/room-allocations', checkAuth, async (req, res) => {
   try {
     const room = new RoomAllocation({
       _id: new mongoose.Types.ObjectId(),
-      roomName: req.body.roomName,
-      capacity: req.body.capacity,
-      floorName: req.body.floorName,
-      startRollNo: req.body.startRollNo,
-      endRollNo: req.body.endRollNo,
-      collegeName:req.body.collegeName,
-      collegeCode:req.body.collegeCode
+      roomName: req.body.roomName?.trim(),
+      capacity: req.body.capacity?.trim(),
+      floorName: req.body.floorName?.trim(),
+      startRollNo: req.body.startRollNo?.trim(),
+      endRollNo: req.body.endRollNo?.trim(),
+      collegeName: req.body.collegeName?.trim(),
+      collegeCode: req.body.collegeCode?.trim()
     });
 
     const result = await room.save();
@@ -29,7 +29,18 @@ router.post('/room-allocations', checkAuth, async (req, res) => {
 // GET: Fetch all rooms
 router.get('/room-allocations', checkAuth, async (req, res) => {
   try {
-    const rooms = await RoomAllocation.find();
+    const { collegeName, collegeCode } = req.query;
+
+    // Validate input
+    if (!collegeName || !collegeCode) {
+      return res.status(400).json({ error: 'collegeName and collegeCode are required in query params' });
+    }
+
+    const rooms = await RoomAllocation.find({
+      collegeName,
+      collegeCode
+    });
+
     res.json(rooms);
   } catch (error) {
     res.status(500).json({ error: error.message });
