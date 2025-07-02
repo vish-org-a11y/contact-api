@@ -114,5 +114,31 @@ router.get('/room-allocations-all', async (req, res) => {
   }
 });
 
+router.get('/search-room', async (req, res) => {
+  const { collegeCode, collegeName, roll } = req.query;
+  const rollNumber = parseInt(roll);
+
+  const extractNumber = (str) => parseInt(str.match(/\d+/)?.[0] || '0');
+
+  try {
+    const rooms = await RoomAllocation.find({ collegeCode, collegeName });
+
+    const found = rooms.find(room => {
+      const start = extractNumber(room.startRollNo);
+      const end = extractNumber(room.endRollNo);
+      return rollNumber >= start && rollNumber <= end;
+    });
+
+    if (found) {
+      res.status(200).json({ ...found._doc, rollNumber });
+    } else {
+      res.status(404).json({ message: "Room not found" });
+    }
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+
 module.exports = router;
 
