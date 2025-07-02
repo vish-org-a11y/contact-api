@@ -8,15 +8,38 @@ const jwt = require('jsonwebtoken')
 // POST: Add Room
 router.post('/room-allocations', checkAuth, async (req, res) => {
   try {
+    const {
+      roomName,
+      capacity,
+      floorName,
+      startRollNo,
+      endRollNo,
+      collegeName,
+      collegeCode
+    } = req.body;
+
+    // Validate required fields
+    if (
+      !roomName ||
+      !capacity ||
+      !floorName ||
+      !startRollNo ||
+      !endRollNo ||
+      !collegeName ||
+      !collegeCode
+    ) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
     const room = new RoomAllocation({
       _id: new mongoose.Types.ObjectId(),
-      roomName: req.body.roomName?.trim(),
-      capacity: req.body.capacity?.trim(),
-      floorName: req.body.floorName?.trim(),
-      startRollNo: req.body.startRollNo?.trim(),
-      endRollNo: req.body.endRollNo?.trim(),
-      collegeName: req.body.collegeName?.trim(),
-      collegeCode: req.body.collegeCode?.trim()
+      roomName: typeof roomName === 'string' ? roomName.trim() : '',
+      capacity: capacity.toString().trim(), // handles number or string
+      floorName: typeof floorName === 'string' ? floorName.trim() : '',
+      startRollNo: typeof startRollNo === 'string' ? startRollNo.trim() : '',
+      endRollNo: typeof endRollNo === 'string' ? endRollNo.trim() : '',
+      collegeName: typeof collegeName === 'string' ? collegeName.trim() : '',
+      collegeCode: typeof collegeCode === 'string' ? collegeCode.trim() : ''
     });
 
     const result = await room.save();
