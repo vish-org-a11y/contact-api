@@ -114,27 +114,43 @@ router.get('/room-allocations-all', async (req, res) => {
   }
 });
 
+
 router.get('/search-room', async (req, res) => {
   const { collegeCode, collegeName, roll } = req.query;
+  const trimmedCollegeName = (collegeName || '').trim();
   const rollNumber = parseInt(roll);
+
+  console.log("Incoming Params:");
+  console.log("collegeCode:", collegeCode);
+  console.log("collegeName (trimmed):", trimmedCollegeName);
+  console.log("rollNumber:", rollNumber);
+
+  if (!collegeCode || !trimmedCollegeName || isNaN(rollNumber)) {
+    return res.status(400).json({ message: "Invalid query parameters" });
+  }
 
   const extractNumber = (str) => parseInt(str.match(/\d+/)?.[0] || '0');
 
   try {
-    const rooms = await RoomAllocation.find({ collegeCode, collegeName });
+    const rooms = await RoomAllocation.find({ collegeCode, collegeName: trimmedCollegeName });
+    console.log("Matched rooms from DB:", rooms.length);
 
     const found = rooms.find(room => {
       const start = extractNumber(room.startRollNo);
       const end = extractNumber(room.endRollNo);
+      console.log(`Checking room ${room.roomName} -> start: ${start}, end: ${end}`);
       return rollNumber >= start && rollNumber <= end;
     });
 
     if (found) {
+      console.log("Room found:", found.roomName);
       res.status(200).json({ ...found._doc, rollNumber });
     } else {
+      console.log("No matching room found");
       res.status(404).json({ message: "Room not found" });
     }
   } catch (err) {
+    console.error("Error:", err.message);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 });
