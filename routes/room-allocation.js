@@ -52,23 +52,34 @@ router.post('/room-allocations', checkAuth, async (req, res) => {
 // GET: Fetch all rooms
 router.get('/room-allocations', checkAuth, async (req, res) => {
   try {
-    const { collegeName, collegeCode } = req.query;
+    const { collegeName, collegeCode, examDate, timeSlot } = req.query;
 
-    // Validate input
     if (!collegeName || !collegeCode) {
-      return res.status(400).json({ error: 'collegeName and collegeCode are required in query params' });
+      return res.status(400).json({ error: 'College name and code are required' });
     }
 
-    const rooms = await RoomAllocation.find({
-      collegeName,
-      collegeCode
-    });
+    // 🧠 Build dynamic query
+    const query = {
+      collegeName: collegeName.trim(),
+      collegeCode: collegeCode.trim()
+    };
 
-    res.json(rooms);
+    if (examDate) {
+      query.examDate = new Date(examDate); // Format: YYYY-MM-DD
+    }
+
+    if (timeSlot) {
+      query.timeSlot = timeSlot.trim();
+    }
+
+    const rooms = await RoomAllocation.find(query);
+    res.status(200).json(rooms);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Fetch error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 // PUT: Update room
 router.put('/room-allocations/:id', checkAuth, async (req, res) => {

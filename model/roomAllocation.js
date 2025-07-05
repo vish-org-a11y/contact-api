@@ -8,7 +8,9 @@ const roomAllocationSchema = new mongoose.Schema({
     startRollNo: { type: String, required: true },
     endRollNo: { type: String, required: true },
     collegeName:{type:String,required:true},
-    collegeCode:{type:String,required:true}
+    collegeCode:{type:String,required:true},
+    examDate: { type: Date, required: true },       
+    timeSlot: { type: String, required: true } 
 })
 
 module.exports = mongoose.model('RoomAllocation',roomAllocationSchema);
