@@ -15,10 +15,12 @@ router.post('/room-allocations', checkAuth, async (req, res) => {
       startRollNo,
       endRollNo,
       collegeName,
-      collegeCode
+      collegeCode,
+      examDate,
+      timeSlot
     } = req.body;
 
-    // Validate required fields
+    // ✅ Validate all required fields
     if (
       !roomName ||
       !capacity ||
@@ -26,7 +28,9 @@ router.post('/room-allocations', checkAuth, async (req, res) => {
       !startRollNo ||
       !endRollNo ||
       !collegeName ||
-      !collegeCode
+      !collegeCode ||
+      !examDate ||
+      !timeSlot
     ) {
       return res.status(400).json({ error: 'All fields are required' });
     }
@@ -34,17 +38,20 @@ router.post('/room-allocations', checkAuth, async (req, res) => {
     const room = new RoomAllocation({
       _id: new mongoose.Types.ObjectId(),
       roomName: typeof roomName === 'string' ? roomName.trim() : '',
-      capacity: capacity.toString().trim(), // handles number or string
+      capacity: capacity.toString().trim(),
       floorName: typeof floorName === 'string' ? floorName.trim() : '',
       startRollNo: typeof startRollNo === 'string' ? startRollNo.trim() : '',
       endRollNo: typeof endRollNo === 'string' ? endRollNo.trim() : '',
       collegeName: typeof collegeName === 'string' ? collegeName.trim() : '',
-      collegeCode: typeof collegeCode === 'string' ? collegeCode.trim() : ''
+      collegeCode: typeof collegeCode === 'string' ? collegeCode.trim() : '',
+      examDate: typeof examDate === 'string' ? examDate.trim() : '',
+      timeSlot: typeof timeSlot === 'string' ? timeSlot.trim() : ''
     });
 
     const result = await room.save();
     res.status(200).json(result);
   } catch (error) {
+    console.error('Save error:', error);
     res.status(400).json({ error: error.message });
   }
 });
