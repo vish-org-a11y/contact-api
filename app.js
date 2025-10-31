@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const collegeRoute = require('./routes/collegeModel')
 const roomAllocationRoute = require('./routes/room-allocation')
 const authRoute = require('./routes/auth');
-const streamRoute = require('./routes/stream'); 
+const streamRoute = require('./routes/streamRoutes'); 
 
 const cors = require('cors');
 require('dotenv').config();
