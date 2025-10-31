@@ -7,7 +7,7 @@ const router = express.Router();
  * POST /api/streams
  * Save stream name permanently (idempotent)
  */
-router.post("/", async (req, res) => {
+router.post("/save", async (req, res) => {
   try {
     const { name } = req.body;
     if (!name || !name.trim()) {
@@ -37,7 +37,7 @@ router.post("/", async (req, res) => {
  * GET /api/streams?q=<text>
  * Fetch stream suggestions (for auto-suggest dropdown)
  */
-router.get("/", async (req, res) => {
+router.get("/suggestions", async (req, res) => {
   try {
     const q = req.query.q?.trim() || "";
     const filter = q
