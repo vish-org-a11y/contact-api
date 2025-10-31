@@ -1,4 +1,6 @@
-import mongoose from "mongoose";
+// model/streamModel.js
+
+const mongoose = require('mongoose');
 
 const streamSchema = new mongoose.Schema(
   {
@@ -8,4 +10,4 @@ const streamSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Stream", streamSchema);
+module.exports = mongoose.model('Stream', streamSchema);
