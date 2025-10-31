@@ -1,5 +1,5 @@
 import express from "express";
-import Stream from "../models/Stream.js"; // create this model (below)
+import Stream from "../model/Stream.js"; // create this model (below)
 
 const router = express.Router();
 
