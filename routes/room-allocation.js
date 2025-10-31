@@ -17,10 +17,12 @@ router.post('/room-allocations', checkAuth, async (req, res) => {
       collegeName,
       collegeCode,
       examDate,
-      timeSlot
+      timeSlot,
+      stream,
+      subject
     } = req.body;
 
-    // ✅ Validate all required fields
+    // ✅ Validate all required fields (including new ones)
     if (
       !roomName ||
       !capacity ||
@@ -30,11 +32,14 @@ router.post('/room-allocations', checkAuth, async (req, res) => {
       !collegeName ||
       !collegeCode ||
       !examDate ||
-      !timeSlot
+      !timeSlot ||
+      !stream ||
+      !subject
     ) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
+    // ✅ Create new Room Allocation document
     const room = new RoomAllocation({
       _id: new mongoose.Types.ObjectId(),
       roomName: typeof roomName === 'string' ? roomName.trim() : '',
@@ -45,11 +50,16 @@ router.post('/room-allocations', checkAuth, async (req, res) => {
       collegeName: typeof collegeName === 'string' ? collegeName.trim() : '',
       collegeCode: typeof collegeCode === 'string' ? collegeCode.trim() : '',
       examDate: typeof examDate === 'string' ? examDate.trim() : '',
-      timeSlot: typeof timeSlot === 'string' ? timeSlot.trim() : ''
+      timeSlot: typeof timeSlot === 'string' ? timeSlot.trim() : '',
+      stream: typeof stream === 'string' ? stream.trim() : '',
+      subject: typeof subject === 'string' ? subject.trim() : ''
     });
 
     const result = await room.save();
-    res.status(200).json(result);
+    res.status(200).json({
+      message: 'Room added successfully',
+      data: result
+    });
   } catch (error) {
     console.error('Save error:', error);
     res.status(400).json({ error: error.message });
