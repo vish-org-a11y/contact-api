@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const collegeRoute = require('./routes/collegeModel')
 const roomAllocationRoute = require('./routes/room-allocation')
 const authRoute = require('./routes/auth');
+const streamRoute = require('./routes/stream'); 
+
 const cors = require('cors');
 require('dotenv').config();
 
@@ -19,6 +21,7 @@ app.use(bodyParser.json());
 app.use('/collegeModel', collegeRoute);
 app.use('/api/room-allocation', roomAllocationRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/stream', streamRoute);
 
 app.use('*', (req, res) => {
     res.status(404).json({ msg: 'bad request' });
