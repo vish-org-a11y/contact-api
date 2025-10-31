@@ -1,5 +1,5 @@
-import express from "express";
-import Stream from "../model/Stream.js"; // create this model (below)
+const express = require("express");
+const Stream = require("../model/Stream"); // make sure this file exists: /model/Stream.js
 
 const router = express.Router();
 
@@ -23,7 +23,10 @@ router.post("/", async (req, res) => {
       await stream.save();
     }
 
-    return res.status(200).json({ message: "Stream saved successfully", stream });
+    return res.status(200).json({
+      message: "Stream saved successfully",
+      stream,
+    });
   } catch (error) {
     console.error("Error saving stream:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -38,10 +41,19 @@ router.get("/", async (req, res) => {
   try {
     const q = req.query.q?.trim() || "";
     const filter = q
-      ? { name: { $regex: q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" } }
+      ? {
+          name: {
+            $regex: q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+            $options: "i",
+          },
+        }
       : {};
 
-    const streams = await Stream.find(filter).sort({ createdAt: -1 }).limit(20).lean();
+    const streams = await Stream.find(filter)
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .lean();
+
     res.status(200).json(streams.map((s) => s.originalName));
   } catch (error) {
     console.error("Error fetching streams:", error);
@@ -49,4 +61,4 @@ router.get("/", async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;
