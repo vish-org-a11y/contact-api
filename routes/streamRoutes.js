@@ -54,7 +54,10 @@ router.get("/suggestions", async (req, res) => {
       .limit(20)
       .lean();
 
-    res.status(200).json(streams.map((s) => s.originalName));
+    //res.status(200).json(streams.map((s) => s.originalName));
+     res.status(200).json({
+      suggestions: streams.map((s) => s.originalName),
+    });
   } catch (error) {
     console.error("Error fetching streams:", error);
     res.status(500).json({ message: "Internal server error" });
