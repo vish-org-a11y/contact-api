@@ -111,26 +111,22 @@ router.post('/login', (req, res) => {
 })
 
 //check user
-router.get('/checkEmail/:email', (req, res) => {
-    CollegeModel.find({ email: req.params.email })
-        .then(result => {
-            if (result.length > 0) {
-                return res.status(200).json({
-                    isAvailable: true
-                })
-            }
-            res.status(200).json({
-                isAvailable: false
-            })
+router.get('/checkEmail/:email', async (req, res) => {
+  try {
+    const existing = await CollegeModel.findOne({ email: req.params.email });
 
-        })
-        .catch(err => {
-            console.log(err)
-            res.status(500).json({
-                error: err
-            })
-        })
-})
+    if (existing) {
+      // Email already exists — not available
+      return res.status(200).json({ isAvailable: false });
+    }
+
+    // Email not found — available to use
+    res.status(200).json({ isAvailable: true });
+  } catch (err) {
+    console.error('Email check failed:', err);
+    res.status(500).json({ message: 'Server error while checking email' });
+  }
+});
 
 module.exports = router;
 
