@@ -106,6 +106,56 @@ router.post('/verify-otp', async (req, res) => {
   }
 });
 
+// ✅ RESEND OTP API
+router.post('/resend-otp', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Email is required.' });
+    }
+
+    // Check if the user exists
+    const collegeModel = await CollegeModel.findOne({ email });
+    if (!collegeModel) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+
+    // Generate new OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    otpStore[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 };
+
+    console.log('Resent OTP:', otp);
+
+    // Send OTP via email
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Your OTP (Resent)',
+      text: `Your new OTP is: ${otp}. It will expire in 5 minutes.`,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'OTP resent successfully to your email.',
+    });
+  } catch (err) {
+    console.error('Resend OTP Error:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to resend OTP. Please try again later.',
+    });
+  }
+});
+
 // router.post('/verify-otp', async (req, res) => {
 //   const { email, otp } = req.body;
 
